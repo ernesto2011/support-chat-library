@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Copy, Download, ThumbsUp, ThumbsDown, Send } from "lucide-react"
-import { useParams } from "react-router"
+//import { useParams } from "react-router"
 
 interface Message {
   role: "agent" | "user"
@@ -12,7 +12,7 @@ interface Message {
 }
 
 export default function ChatPage() {
-  const { chatId } = useParams()
+  //const { chatId } = useParams()
   const [input, setInput] = useState("")
   const [messages] = useState<Message[]>([
     {
