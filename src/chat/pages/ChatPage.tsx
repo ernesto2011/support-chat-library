@@ -2,51 +2,61 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Copy, Download, ThumbsUp, ThumbsDown, Send } from "lucide-react"
-//import { useParams } from "react-router"
+import { Copy, Download, ThumbsUp, ThumbsDown, Send, MessagesSquare } from "lucide-react"
+import { useQuery } from "@tanstack/react-query"
+import { useParams } from "react-router"
+import { getClientMessages } from "@/fake/fake-data"
 
-interface Message {
-  role: "agent" | "user"
-  content: string
-  timestamp: string
-}
 
 export default function ChatPage() {
-  //const { chatId } = useParams()
+  const { chatId } = useParams()
   const [input, setInput] = useState("")
-  const [messages] = useState<Message[]>([
-    {
-      role: "agent",
-      content: "Hello, I am a generative AI agent. How may I assist you today?",
-      timestamp: "4:08:28 PM",
-    },
-    {
-      role: "user",
-      content: "Hi, I'd like to check my bill.",
-      timestamp: "4:08:37 PM",
-    },
-    {
-      role: "agent",
-      content:
-        "Please hold for a second.\n\nOk, I can help you with that\n\nI'm pulling up your current bill information\n\nYour current bill is $150, and it is due on August 31, 2024.\n\nIf you need more details, feel free to ask!",
-      timestamp: "4:08:37 PM",
-    },
-  ])
-
+  const {data:messages=[], isLoading}= useQuery({
+    queryKey:['chat', chatId],
+    queryFn: ()=>getClientMessages(chatId!),
+  })
+  if(isLoading){
+    return (
+      <div className="flex-1 flex flex-col items-center">
+        <div className="space-y-4 w-full max-w-md">
+          {Array.from({ length: 5 }).map((_, index) => (
+        <div key={index} className="flex gap-2 animate-pulse">
+          <div className="h-8 w-8 rounded-full bg-muted flex-shrink-0" />
+          <div className="flex-1 space-y-2">
+            <div className="h-4 bg-muted rounded w-1/3" />
+            <div className="h-6 bg-muted rounded w-full" />
+          </div>
+        </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
   return (
     <div className="flex-1 flex flex-col">
-      <ScrollArea className="flex-1 p-4">
+      {
+        messages.length===0 ? (
+          <div className="flex-1 flex flex-col gap-2 items-center justify-center">
+             <MessagesSquare className=" h-8 w-8 text-muted-foreground"/>
+            <div className="flex flex-col items-center text-center text-muted-foreground">
+              <p className="text-sm">No messages yet</p>
+              <p className="text-sm">Start the conversation</p>
+            </div>
+          </div>
+        )
+      :
+      (<ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
           {messages.map((message, index) => (
             <div key={index} className="w-full">
-              {message.role === "agent" ? (
+              {message.sender === "agent" ? (
                 // Agent message - left aligned
                 <div className="flex gap-2 max-w-[80%]">
                   <div className="h-8 w-8 rounded-full bg-primary flex-shrink-0" />
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">NexTalk</span>
-                      <span className="text-sm text-muted-foreground">{message.timestamp}</span>
+                      <span className="text-sm text-muted-foreground">{message.createdAt.toLocaleString()}</span>
                     </div>
                     <div className="p-3 bg-muted/50 rounded-lg">
                       <p className="text-sm whitespace-pre-wrap">{message.content}</p>
@@ -72,7 +82,7 @@ export default function ChatPage() {
                 <div className="flex flex-col items-end">
                   <div className="text-right mb-1">
                     <span className="text-sm font-medium mr-2">G5</span>
-                    <span className="text-sm text-muted-foreground">{message.timestamp}</span>
+                    <span className="text-sm text-muted-foreground">{message.createdAt.toLocaleTimeString()}</span>
                   </div>
                   <div className="bg-black text-white p-3 rounded-lg max-w-[80%]">
                     <p className="text-sm whitespace-pre-wrap">{message.content}</p>
@@ -82,7 +92,8 @@ export default function ChatPage() {
             </div>
           ))}
         </div>
-      </ScrollArea>
+      </ScrollArea>)
+      }
       <div className="p-4 border-t">
         <div className="flex items-center gap-2">
           <Textarea

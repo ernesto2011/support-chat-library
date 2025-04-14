@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { AuthLayout } from "@/auth/layout/AuthLayout";
 import { LoginPage, RegisterPage } from "@/auth/pages";
 import { sleep } from "./lib/sleep";
+import { PrivateRoute } from "./auth/components/PrivateRoute";
 
 const ChatLayout = lazy(async () => {
   await sleep(1500);
@@ -32,7 +33,9 @@ export const AppRouter = () => {
                 </div>
               }
             >
-              <ChatLayout />
+              <PrivateRoute isAuthenticated={false}>
+                <ChatLayout />
+              </PrivateRoute>
             </Suspense>
           }
         >

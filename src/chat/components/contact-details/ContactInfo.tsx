@@ -11,7 +11,7 @@ export const ContactInfo = ({client}:Props) => {
           {client.name.charAt(0)}
           {client.name.charAt(1)}
         </div>
-        <h3 className="font-semibold text-lg">{client?.name}</h3>
+        <h3 className="font-semibold text-lg">{client.name}</h3>
         <p className="text-sm text-muted-foreground">{client.currentPlan.toUpperCase()}</p>
         <div className="flex items-center mt-1">
           <div className="h-2 w-2 rounded-full bg-green-500 mr-1"></div>

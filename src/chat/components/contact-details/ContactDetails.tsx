@@ -8,15 +8,16 @@ import { ContactInfoSkeleton } from "./ContactInfoSkeleton"
 export const ContactDetails = () => {
     const {chatId} = useParams()
     const {data:client, isLoading} = useQuery({
-        queryKey: ['chat', chatId],
-        queryFn: ()=>getClient(chatId!),
+        queryKey: ['client', chatId],
+        queryFn: ()=>getClient(chatId ?? ''),
         enabled: !!chatId,
-        staleTime: 1000 * 60 * 2
+        staleTime: 1000 * 60 * 5
     })
-    console.log(client)
     if(!chatId) return (<NoContactSelected/>)
-    if(isLoading) return (<ContactInfoSkeleton/>)
-    if(client) return (<ContactInfo client={client}/>)
+    if(isLoading && !client) return (<ContactInfoSkeleton/>)
+    if(client) {
+        return <ContactInfo client={client}/>
+    }
   return (
     <div>client not found</div>
   )
