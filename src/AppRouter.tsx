@@ -14,7 +14,7 @@ const ChatLayout = lazy(async () => {
 const ChatPage = lazy(() => import("@/chat/pages/ChatPage"));
 const NoChatPage = lazy(() => import("@/chat/pages/NoChatPage"));
 export const AppRouter = () => {
-  const {data:user, isLoading, isError, error} = useQuery({
+  const {data:user, isLoading} = useQuery({
     queryKey: ["user"],
     queryFn: () => {
       const token= localStorage.getItem('token');
