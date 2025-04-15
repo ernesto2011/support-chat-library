@@ -4,6 +4,8 @@ import { AuthLayout } from "@/auth/layout/AuthLayout";
 import { LoginPage, RegisterPage } from "@/auth/pages";
 import { sleep } from "./lib/sleep";
 import { PrivateRoute } from "./auth/components/PrivateRoute";
+import { useQuery } from "@tanstack/react-query";
+import { checkAuth } from "./fake/fake-data";
 
 const ChatLayout = lazy(async () => {
   await sleep(1500);
@@ -12,6 +14,25 @@ const ChatLayout = lazy(async () => {
 const ChatPage = lazy(() => import("@/chat/pages/ChatPage"));
 const NoChatPage = lazy(() => import("@/chat/pages/NoChatPage"));
 export const AppRouter = () => {
+  const {data:user, isLoading, isError, error} = useQuery({
+    queryKey: ["user"],
+    queryFn: () => {
+      const token= localStorage.getItem('token');
+      if(!token){
+        throw new Error('No hay token')
+      }
+      return checkAuth(token)
+    },
+    retry: 0,
+  })
+  if(isLoading){
+    return (
+      <div className="flex h-screen items-center justify-center bg-background ">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      </div>
+    )
+  }
+
   return (
     <BrowserRouter>
       <Routes>
@@ -33,7 +54,7 @@ export const AppRouter = () => {
                 </div>
               }
             >
-              <PrivateRoute isAuthenticated={false}>
+              <PrivateRoute isAuthenticated={!!user}>
                 <ChatLayout />
               </PrivateRoute>
             </Suspense>
